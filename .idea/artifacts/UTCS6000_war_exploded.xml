@@ -1,0 +1,19 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="UTCS6000:war exploded">
+    <output-path>D:/Tomcat/webapps/UTCS6000</output-path>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="UTCS6000" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="lib" />
+          <element id="library" level="project" name="netty-all-4.1.5.Final" />
+          <element id="library" level="module" name="JUnit4" module-name="UTCS6000" />
+        </element>
+      </element>
+      <element id="javaee-facet-resources" facet="UTCS6000/web/Web" />
+      <element id="javaee-facet-resources" facet="UTCS6000/web/Web2" />
+    </root>
+  </artifact>
+</component>

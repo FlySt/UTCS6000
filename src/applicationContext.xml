@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	   xmlns:context="http://www.springframework.org/schema/context"
+	   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	   xmlns:aop="http://www.springframework.org/schema/aop"
+	   xmlns:tx="http://www.springframework.org/schema/tx"
+	   xmlns:jaxws="http://cxf.apache.org/jaxws"
+	   xsi:schemaLocation="http://www.springframework.org/schema/beans
+			http://www.springframework.org/schema/beans/spring-beans-2.5.xsd
+			http://www.springframework.org/schema/context
+			http://www.springframework.org/schema/context/spring-context-3.0.xsd
+			http://www.springframework.org/schema/aop
+			http://www.springframework.org/schema/aop/spring-aop-2.5.xsd
+			http://www.springframework.org/schema/tx
+			http://www.springframework.org/schema/tx/spring-tx-2.5.xsd
+			http://cxf.apache.org/jaxws http://cxf.apache.org/schemas/jaxws.xsd">
+
+	<import resource="classpath*:META-INF/cxf/cxf.xml" />
+	<!--<import resource="classpath:META-INF/cxf/cxf-extension-soap.xml"/>-->
+	<import resource="classpath*:META-INF/cxf/cxf-servlet.xml" />
+	<jaxws:endpoint id="UtcsWebService" implementor="com.ncjk.utcs.common.service.UtcsWebServiceImpl" address="/"/>
+	<jaxws:endpoint id="UtcsJkService" implementor="com.ncjk.utcs.common.webservice.server.UtcsJkServiceImpl" address="/UtcsJk/"/>
+	<!-- 注解配置 -->
+	<context:annotation-config />
+	<context:component-scan base-package="com.ncjk.utcs" />
+
+
+	<bean id="propertyConfigurer"  class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	  <property name="locations">
+	     <list>
+	     	<value>classpath:config.properties</value>
+		<value>classpath:common.properties</value>
+	     </list>
+	  </property>
+	  <property name="propertiesPersister">
+            <bean class="com.ncjk.utcs.common.util.DataBaseDecrypt" />
+       </property>
+       <property name ="ignoreResourceNotFound" value="true"/> 
+	</bean>	
+
+ 	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" value="${oracle.driverClassName}" />
+		<property name="jdbcUrl" value="${oracle.url}" />
+		<property name="user" value="${oracle.username}" />
+		<property name="password" value="${oracle.password}" />
+		<property name="minPoolSize" value="${oracle.minPoolSize}" />
+		<property name="maxPoolSize" value="${oracle.maxPoolSize}" />
+		<property name="initialPoolSize" value="${oracle.initialPoolSize}" />
+		<property name="maxIdleTime" value="${oracle.maxIdleTime}" />
+	  	<property name="acquireIncrement" value="${oracle.acquireIncrement}" />
+		<property name="testConnectionOnCheckin" value="${oracle.testConnectionOnCheckin}" />
+		<property name="idleConnectionTestPeriod" value="${oracle.idleConnectionTestPeriod}" />
+
+	<!--  	<property name="validationQuery" value="${oracle.validationQuery}" />  -->
+		
+	</bean>
+	
+	<!-- Hibernate AnnotationSessionFactoryBean for SessionFactory -->
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="packagesToScan">
+			<list>
+				<value>com.ncjk.utcs.modules.resources.basic.pojo</value>
+				<value>com.ncjk.utcs.modules.logs.pojo</value>
+				<value>com.ncjk.utcs.modules.system.pojo</value>
+				<value>com.ncjk.utcs.modules.map.pojo</value>
+				<value>com.ncjk.utcs.modules.query.pojo</value>
+				<value>com.ncjk.utcs.modules.resources.resources.pojo</value>
+			</list>
+		</property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">
+					org.hibernate.dialect.MySQLDialect
+				</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="hibernate.format_sql">true</prop>
+				<!--<prop key="hibernate.hbm2ddl.auto">false</prop>-->
+			</props>
+		</property>
+	</bean>
+	
+	<bean id="hibernateTemplate" class="org.springframework.orm.hibernate3.HibernateTemplate">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+	
+	<!-- Transaction manager for Hibernate -->
+	<bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory" />
+	</bean>
+
+	<aop:aspectj-autoproxy />
+	
+	<aop:config>
+		<aop:pointcut id="webPointcut"  expression="(execution(*  com.ncjk.utcs.common.dao.*.*(..)))"/>
+  		<aop:advisor advice-ref="txAdvice" pointcut-ref="webPointcut"/>
+	</aop:config>
+	
+	<!-- 定义事务通知 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<tx:method name="login*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="add*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="insert*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="update*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="modify*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="change*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="save*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="delete*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="remove*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="count*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="*ToUpdate" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="get*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="find*" propagation="SUPPORTS" isolation="READ_COMMITTED" />
+			<tx:method name="load*" propagation="SUPPORTS" read-only="true" />
+			<tx:method name="del*" propagation="REQUIRED" isolation="READ_COMMITTED" />
+			<tx:method name="*Alarm" propagation="REQUIRED" isolation="READ_COMMITTED" />
+		</tx:attributes>
+	</tx:advice>
+	
+	  <bean id="applicationContext" class="com.ncjk.utcs.common.servlet.SpringUtil">
+	</bean>
+
+	<bean id="common" class="com.ncjk.utcs.common.servlet.CommonPro">
+		<property name="version" value="${common.version}" />
+		<property name="company" value="${common.company}" />
+		<property name="copyright" value="${common.copyright}" />
+		<property name="layers" value="${common.layers}" />
+		<property name="ipAddr" value="${common.ipAddr}" />
+		<property name="port" value="${common.port}" />
+		<property name="lon" value="${common.lon}" />
+		<property name="lat" value="${common.lat}" />
+	</bean>
+
+	<bean id="client" class="com.ncjk.ticp.ticp.wgb.IGBTICPJK_GBTICPJKImplPort_Client" >
+	</bean>
+
+	<bean id="nettyServer" class="com.ncjk.utcs.common.netty.server.NettyServer" >
+	</bean>
+
+	<!-- 定时调度 -->
+	<bean id="countTrafficDataQuertz" class="com.ncjk.utcs.common.quertz.CountTrafficData"/>
+	<!-- 每天一次 -->
+	<bean id="countTrafficDataJobDetail" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<property name="targetObject">
+			<ref local="countTrafficDataQuertz"/>
+		</property>
+		<property name="targetMethod" value="doOnceDay"/>
+	</bean>
+	<bean id="countTrafficDataTrigger" class="org.springframework.scheduling.quartz.CronTriggerBean">
+		<property name="jobDetail">
+			<ref local="countTrafficDataJobDetail"/>
+		</property>
+		<property name="cronExpression" value="0 59 23 * * ?"/>
+	</bean>
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<ref local="countTrafficDataTrigger" />
+			</list>
+		</property>
+	</bean>
+</beans>

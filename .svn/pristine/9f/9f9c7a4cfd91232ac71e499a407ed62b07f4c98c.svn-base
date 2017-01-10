@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN"
+    "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	
+	<constant name="struts.i18n.encoding" value="UTF-8" />
+	<constant name="struts.ui.theme" value="simple" />
+	<constant name="struts.devMode" value="false" />
+	<include file="struts-default.xml" />
+	<constant name="struts.multipart.maxSize" value="10485760000" />
+	<package name="struts2" extends="json-default">
+	
+	</package>
+	<!-- 基础信息Action -->
+	<include file="com/ncjk/utcs/modules/resources/resource/struts_basic.xml" />	
+	<!-- 公用树Action -->
+	<include file="com/ncjk/utcs/modules/common/resources/struts_common.xml" />	
+	<!-- 用户登录Action -->
+	<include file="com/ncjk/utcs/modules/access/resources/struts_access.xml" />	
+	<!-- 系统参数Action -->
+	<include file="com/ncjk/utcs/modules/system/resources/struts_system.xml" />	
+	<!-- 操作日志Action -->
+	<include file="com/ncjk/utcs/modules/logs/resources/struts_log.xml" />
+	<!-- 电子地图Action -->
+	<include file="com/ncjk/utcs/modules/map/resources/struts_map.xml" />
+	<!-- 综合查询Action -->
+	<include file="com/ncjk/utcs/modules/query/resources/struts_query.xml" />
+</struts>

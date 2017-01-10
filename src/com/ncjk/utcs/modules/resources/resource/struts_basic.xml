@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC
+    "-//Apache Software Foundation//DTD Struts Configuration 2.0//EN"
+    "http://struts.apache.org/dtds/struts-2.0.dtd">
+
+<struts>
+	<constant name="struts.i18n.encoding" value="utf-8"></constant>
+	<package name="struts2_base" extends="struts2">
+	    <!-- 部门管理 -->
+		<action name="dept_*" class="deptAction" method="{1}">
+			<result name="modifyDept">/modules/resourceManage/deptForm.jsp</result>	
+		</action>
+		<!-- 用户组管理Action -->
+		<action name="userGroup_*" class="userGroupAction" method="{1}">
+			<result name="modifyUserGroup">/modules/resourceManage/userGroupForm.jsp</result>	
+		</action>
+		<!-- 用户管理Action -->
+		<action name="user_*" class="userAction" method="{1}">
+			<result name="modifyUser">/modules/resourceManage/userForm.jsp</result>	
+		</action>
+		<!-- 区域管理Action -->
+		<action name="region_*" class="regionParamAction" method="{1}">
+			<result name="modifyRegion">/modules/resourceManage/regionForm.jsp</result>
+		</action>
+		<!-- 路口管理Action -->
+		<action name="cross_*" class="crossParamAction"  method="{1}">
+			<result name="modifyCross">/modules/resourceManage/crossForm.jsp</result>
+		</action>
+		<!-- 信号机管理 -->
+		<action name="signalControler_*" class="signalControlerAction" method="{1}">
+			<result name="modifySignalControler">/modules/resourceManage/signalForm.jsp</result>
+		</action>
+		<!-- 服务器管理 -->
+		<action name="server_*" class="serverParamAction" method="{1}">
+			<result name="modifyServer">/modules/resourceManage/serverForm.jsp</result>
+		</action>
+		<!-- 非国标信号机管理 -->
+		<action name="signal_*" class="signalDeviceAction" method="{1}">
+		</action>
+	</package>
+</struts>

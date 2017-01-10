@@ -1,0 +1,25 @@
+
+##oracle
+##oracle.driverClassName=com.mysql.jdbc.Driver//oracle.jdbc.driver.OracleDriver
+##oracle.url=jdbc\:oracle\:thin\:@localhost\:1521\:UTMS
+oracle.driverClassName=com.mysql.jdbc.Driver
+oracle.url=jdbc:mysql://192.168.200.244:3306/UTCS?useUnicode=true&characterEncoding=utf8
+oracle.username=ef615d23aca95104ee419f9dd2a54454
+oracle.password=48378a47ef19069231af5f35145492d8
+oracle.initialSize=10
+oracle.maxActive=30
+oracle.maxIdle=35
+oracle.minIdle=12
+oracle.maxWait=100
+oracle.removeAbandoned=true
+oracle.removeAbandonedTimeout=280
+oracle.logAbandoned=true
+oracle.validationQuery=select 1 from dual
+oracle.testOnBorrow=true
+oracle.minPoolSize=10
+oracle.maxPoolSize=100
+oracle.initialPoolSize=20
+oracle.maxIdleTime=20
+oracle.acquireIncrement=30
+oracle.testConnectionOnCheckin=true
+oracle.idleConnectionTestPeriod=300
