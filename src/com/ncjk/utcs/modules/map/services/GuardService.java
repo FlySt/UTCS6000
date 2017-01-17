@@ -178,6 +178,34 @@ public class GuardService implements IGuardService{
     }
 
     /**
+     * 根据方案ID查询方案信号机
+     * @param guardId
+     * @return
+     */
+    @Override
+    public JSONObject getGuardSignalByGuardId(Integer guardId) {
+        JSONObject object = new JSONObject();
+        JSONArray array = new JSONArray();
+        String hql = "from UtcsGuardSignal t where t.utcsGuard.guardId="+guardId;
+        List<UtcsGuardSignal> utcsGuardSignalList = ( List<UtcsGuardSignal> )commonDAO.findByHql(hql,0,0);
+        if(utcsGuardSignalList!=null && !utcsGuardSignalList.isEmpty()){
+            for(UtcsGuardSignal guardSignal:utcsGuardSignalList){
+                JSONObject js = new JSONObject();
+                UtcsSignalControler utcsSignalControler = signalControlerService.findSignalControlerById(guardSignal.getSignalControlerId());
+                js.put("lastToTime",guardSignal.getLastToTime());
+                js.put("passTime",guardSignal.getPassTime());
+                js.put("direction",guardSignal.getDirection());
+                js.put("guardSignalId",guardSignal.getGuardSignalId());
+                js.put("guardIndex",guardSignal.getGuardIndex());
+                js.put("signalControlerName",utcsSignalControler.getSignalControlerName());
+                array.add(js);
+            }
+            object.put("data",array);
+        }
+        return object;
+    }
+
+    /**
      * 根据方案ID获取信号机信息
      * @param guardId
      * @return

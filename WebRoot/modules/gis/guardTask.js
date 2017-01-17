@@ -67,6 +67,20 @@ $(function(){
         currentGuardId = 0;
     });
     $.fn.dataTable.ext.errMode = function(s,h,m){};
+    $("table ").on("click","tr:gt(0)",function(){
+        var row=mangerTable.row($(this));
+        var points = row.data().points;
+        var guardId = row.data().guardId;
+        currentGuardId = guardId;
+        if(guardType=="planManger"){
+            drawLine(points,0);
+        }else if(guardType=="guardTask"){
+            guardClear();
+            drawLine(points,3);
+            $( ".start-btn" ).button({ disabled: false });
+        }
+        getGuardInfo(guardId);
+    })
 });
 function tableInit(){
     guardTable=$('#guard').DataTable({
@@ -74,7 +88,7 @@ function tableInit(){
         "lengthChange":false,
         "searching":false,
         "paging": false,
-        "scrollY":tableHeight,//"500px",
+        "scrollY":"350px",//"500px",
         "ajax": path+'/guard_queryGuards.action?guardStatus=1',
         "columns": [
             { "data": "guardId",  "visible":false, "orderable":false},
@@ -83,17 +97,15 @@ function tableInit(){
             { "data": "guardStatus", "width":"30%","orderable":false,
                 "render": function (data, type, row) {
                     if(data==0){
-                        return "<span style='color: red;background-color: transparent'>未审核</span>";
+                        return "<span style='font-size:8pt;color: red;background-color: transparent'>未审核</span>";
                     }else if(data==1){
-                        return "<span style='color: blue;background-color: transparent'>已审核</span>";
+                        return "<span style='font-size:8pt;color: blue;background-color: transparent'>已审核</span>";
                     }
                 }
             },
             { "data": null,  "width":"35%", "orderable":false,"defaultContent":
-                "<a style='font-size:1em;padding: 0.1em 0.2em;' class='watch-btn ui-button ui-widget ui-button-icon-only' title='查看' style='cursor:pointer' type='button'>" +
-                "<span class='ui-icon ui-icon-gear'></span>查看</a>" +
-                "<a style='font-size:1em;padding: 0.1em 0.2em;' class='start-btn ui-button ui-widget ui-button-icon-only' title='开启' style='cursor:pointer' type='button'>" +
-                "<span class='ui-icon ui-icon-play'></span>开启</a>"}
+                "<button style='font-size:1em;padding: 0.1em 0.2em;' class='start-btn ui-button ui-widget ui-state-disabled' type='button'>开启" +
+                    "<span class='ui-icon ui-icon-play'></span></button>"}
         ]
     });
 }
@@ -103,7 +115,7 @@ function mangerTableInit(){
         "lengthChange":false,
         "searching":false,
         "paging": false,
-        "scrollY": tableHeight,//"500px",
+        "scrollY": "350px",//"500px",
         "ajax": path+'/guard_queryGuards.action',
         "columns": [
             { "data": "guardId",
@@ -121,17 +133,15 @@ function mangerTableInit(){
             { "data": "guardStatus", "width":"30%","orderable":false,
                 "render": function (data, type, row) {
                     if(data==0){
-                        return "<span style='color: red;background-color: transparent'>未审核</span>";
+                        return "<span style='font-size:8pt;color: red;background-color: transparent'>未审核</span>";
                     }else if(data==1){
-                        return "<span style='color: blue;background-color: transparent'>已审核</span>";
+                        return "<span style='font-size:8pt;color: blue;background-color: transparent'>已审核</span>";
                     }
                 }
             },
             { "data": null,  "width":"40%", "orderable":false,"defaultContent":
-                "<a style='font-size:1em;padding: 0.1em 0.2em;cursor:pointer'class='watch-btn ui-button ui-widget ui-button-icon-only' title='查看' type='button'>" +
-                "<span class='ui-icon ui-icon-gear'></span>查看</a>" +
-                "<a style='font-size:1em;padding: 0.1em 0.2em;cursor:pointer' class='del-btn ui-button ui-widget ui-button-icon-only' title='删除' type='button'>" +
-                "<span class='ui-icon ui-icon-trash'></span>删除</a>"}
+                "<a style='font-size:1em;padding: 0.1em 0.2em;cursor:pointer' class='del-btn ui-button ui-widget' title='删除' type='button'>" +
+                "删除<span class='ui-icon ui-icon-trash'></span></a>"}
         ]
     });
 }
@@ -141,7 +151,7 @@ function auditTableInit(){
         "lengthChange":false,
         "searching":false,
         "paging": false,
-        "scrollY": tableHeight,//"500px",
+        "scrollY": "350px",//"500px",
         "ajax": path+'/guard_queryGuards.action',
         "columns": [
             { "data": "guardId",  "visible":false, "orderable":false},
@@ -150,9 +160,9 @@ function auditTableInit(){
             { "data": "guardStatus", "width":"30%","orderable":false,
                 "render": function (data, type, row) {
                     if(data==0){
-                        return "<span style='color: red;background-color: transparent'>未审核</span>";
+                        return "<span style='font-size:8pt;color: red;background-color: transparent'>未审核</span>";
                     }else if(data==1){
-                        return "<span style='color: blue;background-color: transparent'>已审核</span>";
+                        return "<span style='font-size:8pt;color: blue;background-color: transparent'>已审核</span>";
                     }
                 }
             },
@@ -170,4 +180,46 @@ function auditTableInit(){
         ]
     });
 }
-
+function getGuardInfo(guardId){
+    $.ajax({
+        url:path+'/guard_getGuardSignalByGuardId.action',
+        dataType:'json',
+        type:'get',
+        data:{
+            "guardId":guardId
+        },
+        success:function(response){
+            showGuardInfo(response.data);
+        }
+    });
+}
+function showGuardInfo(data){
+    $("#guardInfo").html("");
+    console.log(data);
+    if(data == undefined){
+        var $span = $("<span style='margin-left: 10px;color: #1c77ac;display: block'>方案未审核</span>");
+        $("#guardInfo").append($span);
+    }else{
+        var guardSignals = guardSignalSort(data);
+        for(var i=0;i<guardSignals.length;i++){
+            var index = guardSignals[i].guardIndex+1;
+            var $span = $("<span style='margin-left: 10px;color: #1c77ac;display: block'>"+index+","+ guardSignals[i].signalControlerName+"</span>");
+            $("#guardInfo").append($span);
+        }
+    }
+}
+//根据信号机guard_index排序
+function guardSignalSort(signals){//排序
+    var tempSignal;
+    for(var i=0;i<signals.length;i++)//根据moduleOrder排序
+    {
+        for(var j=i+1;j<signals.length;j++){
+            if(signals[i].guardIndex>signals[j].guardIndex){
+                tempSignal = signals[i];
+                signals[i] = signals[j];
+                signals[j] = tempSignal;
+            }
+        }
+    }
+    return signals;
+}

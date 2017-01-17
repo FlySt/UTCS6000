@@ -70,6 +70,12 @@ public interface IGuardService {
     JSONObject getGuardSignal(Integer signalControlerId,Integer guardId);
 
     /**
+     * 根据方案ID查询方案信号机
+     * @param guardId
+     * @return
+     */
+    JSONObject getGuardSignalByGuardId(Integer guardId);
+    /**
      * 根据方案ID获取信号机信息
      * @param guardId
      * @return

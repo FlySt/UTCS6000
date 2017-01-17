@@ -203,4 +203,5 @@
         if(source!=null){
             source.clear();
         }
+        $("#guardInfo").html("");
     }

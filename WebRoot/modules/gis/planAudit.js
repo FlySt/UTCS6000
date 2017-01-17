@@ -22,7 +22,7 @@ var table;
             drawLine(points,2);
         });
         $(map.getViewport()).on("contextmenu", function(evt) {
-            if(currentGuardId == 0){
+            if(currentGuardId == 0 || guardType != "planAudit"){
                 return ;
             }
             evt.preventDefault();
@@ -33,9 +33,7 @@ var table;
             if (feature && typeof feature.get("id")!="undefined") {
                 var id = feature.get("id");
                 var signalControlerId = id.substring(id.indexOf("_")+1,id.length);
-                console.log("signalControlerId："+signalControlerId);
                 var isSuccess = formInit(signalControlerId);
-                console.log("isSuccess:"+isSuccess);
                 if(formInit(signalControlerId)){
                     $("#pointInfo").dialog({
                         height: 300,

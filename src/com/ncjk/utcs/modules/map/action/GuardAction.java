@@ -4,6 +4,8 @@ import com.ncjk.utcs.modules.logs.services.interfaces.ILogService;
 import com.ncjk.utcs.modules.map.pojo.UtcsGuard;
 import com.ncjk.utcs.modules.map.pojo.UtcsGuardSignal;
 import com.ncjk.utcs.modules.map.services.interfaces.IGuardService;
+import com.ncjk.utcs.modules.resources.resources.pojo.UtcsSignalControler;
+import com.ncjk.utcs.modules.resources.resources.services.interfaces.ISignalControlerService;
 import com.opensymphony.xwork2.ActionSupport;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
@@ -29,6 +31,8 @@ public class GuardAction extends ActionSupport{
     IGuardService guardService;
     @Resource
     ILogService logService;
+    @Resource
+    ISignalControlerService signalControlerService;
     private UtcsGuard utcsGuard= new UtcsGuard();
     //描点集合
     private String pointArrays;
@@ -86,9 +90,11 @@ public class GuardAction extends ActionSupport{
      * 添加方案信号机信息
      */
     public void addGuardSignal(){
+        boolean isExist = false;
         List<UtcsGuardSignal> utcsGuardSignalList = new ArrayList<UtcsGuardSignal>();
         HttpServletResponse response = ServletActionContext.getResponse();
         response.setContentType("text/json;charset=utf-8");
+        JSONObject jsonObject = new JSONObject();
         for(int i=0;i<signalControlerIds.length;i++){
             UtcsGuardSignal utcsGuardSignal = guardService.findGuardSignalBySignalControlerId(signalControlerIds[i]);
             if(utcsGuardSignal==null){
@@ -99,11 +105,20 @@ public class GuardAction extends ActionSupport{
                 utcsGuardSignal.setLastToTime(0);
                 utcsGuardSignal.setPassTime(0);
                 utcsGuardSignalList.add(utcsGuardSignal);
+            }else{//信号机已存在与别的方案中
+                isExist = true;
+                UtcsSignalControler utcsSignalControler = signalControlerService.findSignalControlerById(signalControlerIds[i]);
+                jsonObject.put("guardName",utcsGuardSignal.getUtcsGuard().getGuardName());
+                jsonObject.put("signalControlerName",utcsSignalControler.getSignalControlerName());
             }
         }
-        boolean isSuccess = guardService.saveOrUpdateGuardSignal(utcsGuardSignalList,guardId);
-        JSONObject jsonObject = new JSONObject();
-        jsonObject.put("result",isSuccess);
+        boolean isSuccess = false;
+        if(!isExist){
+            isSuccess = guardService.saveOrUpdateGuardSignal(utcsGuardSignalList,guardId);
+            jsonObject.put("result",isSuccess);
+        }else{
+            jsonObject.put("result",false);
+        }
         String logMsg = "失败";
         if(isSuccess){
             logMsg = "成功";
@@ -128,7 +143,19 @@ public class GuardAction extends ActionSupport{
             e.printStackTrace();
         }
     }
-
+    /**
+     * 根据方案ID获取方案信号机信息
+     */
+    public void getGuardSignalByGuardId(){
+        HttpServletResponse response = ServletActionContext.getResponse();
+        response.setContentType("text/json;charset=utf-8");
+        JSONObject jsonObject = guardService.getGuardSignalByGuardId(guardId);
+        try {
+            response.getWriter().write(jsonObject.toString());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     /**
      * 根据方案ID获取信号机信息
      */

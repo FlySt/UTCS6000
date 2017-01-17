@@ -82,6 +82,12 @@
                     </thead>
                 </table>
             </div>
+            <div style="position: absolute;top: 400px;left: 0;right: 0;bottom: 0">
+                <h2 style="color: #1c77ac;margin-left: 5px">方案信息：</h2>
+                <div id="guardInfo">
+
+                </div>
+            </div>
         </div>
         <div id="tabs"  style="position: absolute;left: 200px;right: 0;top: 1px;bottom: 0;">
             <ul>

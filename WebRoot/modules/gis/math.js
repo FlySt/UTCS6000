@@ -15,6 +15,8 @@ function findSignal(geometry){
     }
     if(signalControlerIds.length>0){
         addSignalToGuard(signalControlerIds);
+    }else{
+        dialog.message("方案中不存在信号机");
     }
 }
 function getSignals(){
@@ -80,6 +82,7 @@ function addSignalToGuard(signalControlerIds){
     for(var i=0;i<signalControlerIds.length;i++){
         guadIndexs.push(i);
     }
+    console.log(signalControlerIds);
     $.ajax({
         url:path+'/guard_addGuardSignal.action',
         type:'post',
@@ -92,7 +95,7 @@ function addSignalToGuard(signalControlerIds){
         },
         success:function (reponse) {
             if(!reponse.result){
-                dialog.message("信号机已存在于其他方案中");
+                dialog.message(reponse.signalControlerName+"已存在于方案"+reponse.guardName+"中");
             }
         }
     })

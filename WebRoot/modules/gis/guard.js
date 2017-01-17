@@ -1,7 +1,7 @@
 
 var crossPositions = [];
 function listenerInit(){
-    $("#guard tbody").on("click",".start-btn",function(){
+    $("#guard tbody").on("click",".start-btn",function(e){
         if(currentGuardId==0){
             return;
         }
@@ -22,6 +22,7 @@ function listenerInit(){
             map.on('postcompose', moveFeature);
             map.render();
         }
+        e.stopPropagation();
     });
     $("#guard tbody").on("click",".watch-btn",function(){
         var row=guardTable.row($(this).parents("tr"));
@@ -31,8 +32,10 @@ function listenerInit(){
     })
 }
 function crossPositionsInit(){
-    for(var i =0;i<crosFeatures.length;i++){
-        linelayers.getSource().removeFeature(crosFeatures[i]);
+    if(linelayers!=null){
+        for(var i =0;i<crosFeatures.length;i++){
+            linelayers.getSource().removeFeature(crosFeatures[i]);
+        }
     }
     crosFeatures=[];
     crossPositions = [];
@@ -93,5 +96,6 @@ function guardClear(){
             stopAnimation(true);
         }
         linelayers.getSource().clear();
+        crosFeatures=[];
     }
 }
